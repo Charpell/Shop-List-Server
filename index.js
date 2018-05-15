@@ -33,22 +33,7 @@ exports.addItem = functions.https.onRequest((req, res) => {
 
     database.push({ item });
 
-    let items = [];
-
-    return database.on('value', (snapshot) => {
-      snapshot.forEach((item) => {
-        items.push({
-          id: item.key,
-          items: item.val().item
-        });
-      });
-      
-      res.status(200).json(items)
-    }, (error) => {
-      res.status(500).json({
-        message: `Something went wrong. ${error}`
-      })
-    })
+    getItemsFromDatabase(res)
   })
 })
 
@@ -61,21 +46,26 @@ exports.getItems = functions.https.onRequest((req, res) => {
       })
     }
 
-    let items = [];
-
-    return database.on('value', (snapshot) => {
-      snapshot.forEach((item) => {
-        items.push({
-          id: item.key,
-          items: item.val().item
-        });
-      });
-      
-      res.status(200).json(items)
-    }, (error) => {
-      res.status(500).json({
-        message: `Something went wrong. ${error}`
-      })
-    })
+    getItemsFromDatabase(res)
   })
 })
+
+
+const getItemsFromDatabase = (res) => {
+  let items = [];
+
+  return database.on('value', (snapshot) => {
+    snapshot.forEach((item) => {
+      items.push({
+        id: item.key,
+        items: item.val().item
+      });
+    });
+    
+    res.status(200).json(items)
+  }, (error) => {
+    res.status(500).json({
+      message: `Something went wrong. ${error}`
+    })
+  })
+}
