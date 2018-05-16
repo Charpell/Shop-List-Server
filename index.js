@@ -17,7 +17,7 @@ const getItemsFromDatabase = (res) => {
     snapshot.forEach((item) => {
       items.push({
         id: item.key,
-        items: item.val().item
+        item: item.val().item
       });
     });   
     res.status(200).json(items);
@@ -51,3 +51,16 @@ exports.getItems = functions.https.onRequest((req, res) => {
     getItemsFromDatabase(res)
   });
 });
+
+exports.deleteItem = functions.https.onRequest((req, res) => {
+  return cors(req, res, () => {
+    if(req.method !== 'DELETE') {
+      return res.status(500).json({
+        message: 'Not allowed'
+      })
+    }
+    const id = req.query.id 
+    admin.database().ref(`/items/${id}`).remove()
+    getItemsFromDatabase(res)
+  })
+})
